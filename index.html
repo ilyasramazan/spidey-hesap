@@ -1,1 +1,526 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spider-Man Hesap Makinesi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #700609;
+            /* Gönderilen resimdeki kırmızılı Çizgi Roman (Comic Book Panel) ve Siyah Örümcek Temalı Arka Plan */
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(180, 15, 20, 0.65) 0%, rgba(30, 0, 5, 0.92) 100%),
+                url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%233a0004' stroke-width='1.5' fill='none' opacity='0.35'%3E%3Crect x='5' y='5' width='50' height='50'/%3E%3Crect x='60' y='5' width='55' height='50'/%3E%3Crect x='5' y='60' width='55' height='55'/%3E%3Crect x='65' y='60' width='50' height='55'/%3E%3Cpath d='M5 55 L55 5'/%3E%3Cpath d='M65 115 L115 65'/%3E%3C/g%3E%3C/svg%3E");
+            background-attachment: fixed;
+            background-size: cover, 160px 160px;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Ortadaki Büyük Siyah Örümcek Simgesi (Görseldeki Logo Motif) */
+        .bg-spider-logo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90vw;
+            max-width: 650px;
+            height: 90vh;
+            max-height: 650px;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.85;
+            filter: drop-shadow(0 0 25px rgba(0,0,0,0.9));
+        }
+
+        /* Spider-Man Kart Şekli ve Parlaması */
+        .spidey-card {
+            background: linear-gradient(145deg, rgba(22, 6, 10, 0.94), rgba(10, 3, 5, 0.97));
+            border: 2px solid rgba(226, 27, 34, 0.5);
+            box-shadow: 
+                0 0 35px rgba(0, 0, 0, 0.9),
+                0 0 15px rgba(226, 27, 34, 0.4),
+                inset 0 0 20px rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+        }
+
+        /* Web / Ağ Çizgisi Süslemeleri */
+        .web-border {
+            position: relative;
+            z-index: 10;
+        }
+        .web-border::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, #e21b22, #111, #e21b22, #111);
+            border-radius: 1.5rem;
+            z-index: -1;
+            opacity: 0.8;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Spider-Man Kart Şekli ve Parlaması */
+        .spidey-card {
+            background: linear-gradient(145deg, rgba(18, 22, 38, 0.95), rgba(8, 10, 20, 0.98));
+            border: 2px solid rgba(226, 27, 34, 0.4);
+            box-shadow: 
+                0 0 30px rgba(226, 27, 34, 0.25),
+                0 0 15px rgba(4, 118, 208, 0.2),
+                inset 0 0 15px rgba(256, 256, 256, 0.03);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Web / Ağ Çizgisi Süslemeleri */
+        .web-border {
+            position: relative;
+        }
+        .web-border::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            background: linear-gradient(45deg, #e21b22, transparent, #0476d0, transparent, #e21b22);
+            border-radius: 1.5rem;
+            z-index: -1;
+            opacity: 0.7;
+        }
+
+        /* Özel Tuş Tasarımları */
+        .btn-spidey {
+            transition: all 0.15s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            user-select: none;
+        }
+
+        .btn-spidey:active {
+            transform: scale(0.92);
+        }
+
+        /* Sayı Tuşları (Mavi Dokunuşlu Karanlık Stil) */
+        .btn-num {
+            background: linear-gradient(135deg, #1a2035, #101424);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .btn-num:hover {
+            background: linear-gradient(135deg, #242c48, #161c33);
+            border-color: rgba(4, 118, 208, 0.5);
+            box-shadow: 0 0 10px rgba(4, 118, 208, 0.3);
+        }
+
+        /* Operatör Tuşları (Kırmızı Spidey Stili) */
+        .btn-op {
+            background: linear-gradient(135deg, #b91218, #e21b22);
+            color: #ffffff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+        .btn-op:hover {
+            background: linear-gradient(135deg, #d3161d, #ff2a32);
+            box-shadow: 0 0 12px rgba(226, 27, 34, 0.6);
+        }
+
+        /* Yardımcı İşlem Tuşları (Spider Mavi Stil) */
+        .btn-action {
+            background: linear-gradient(135deg, #035293, #0476d0);
+            color: #ffffff;
+        }
+        .btn-action:hover {
+            background: linear-gradient(135deg, #0465b5, #058af3);
+            box-shadow: 0 0 12px rgba(4, 118, 208, 0.6);
+        }
+
+        /* Eşittir Butonu */
+        .btn-equal {
+            background: linear-gradient(135deg, #e21b22, #0476d0);
+            color: #ffffff;
+            font-weight: bold;
+        }
+        .btn-equal:hover {
+            background: linear-gradient(135deg, #ff242b, #058bf5);
+            box-shadow: 0 0 18px rgba(226, 27, 34, 0.8), 0 0 18px rgba(4, 118, 208, 0.8);
+        }
+
+        /* Temizleme Butonu (C) */
+        .btn-clear {
+            background: linear-gradient(135deg, #880e12, #a81318);
+            color: #ffcccc;
+        }
+        .btn-clear:hover {
+            background: linear-gradient(135deg, #a81318, #c9181e);
+            box-shadow: 0 0 12px rgba(226, 27, 34, 0.7);
+        }
+
+        /* Örümcek Ağı SVG Maskesi Dekorasyonu */
+        .spider-logo {
+            filter: drop-shadow(0 0 6px rgba(226, 27, 34, 0.8));
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 relative overflow-x-hidden">
+
+    <!-- Gönderilen Görseldeki Siyah Örümcek Vektör Logosu (Arka Plan Merkezinde) -->
+    <svg class="bg-spider-logo" viewBox="0 0 500 500" fill="#050304" xmlns="http://www.w3.org/2000/svg">
+        <path d="M250 190 Q240 170 230 140 Q240 135 250 135 Q260 135 270 140 Q260 170 250 190 Z" />
+        <path d="M250 195 Q235 220 225 260 Q250 285 275 260 Q265 220 250 195 Z" />
+        <path d="M250 265 Q230 310 235 370 Q250 430 250 430 Q250 430 265 370 Q270 310 250 265 Z" />
+        <!-- Sol Üst Bacaklar -->
+        <path d="M240 175 C210 130 170 90 120 70 C145 110 180 150 225 185 Z" />
+        <path d="M238 185 C190 150 140 120 80 120 C115 155 160 185 220 200 Z" />
+        <!-- Sağ Üst Bacaklar -->
+        <path d="M260 175 C290 130 330 90 380 70 C355 110 320 150 275 185 Z" />
+        <path d="M262 185 C310 150 360 120 420 120 C385 155 340 185 280 200 Z" />
+        <!-- Sol Alt Bacaklar -->
+        <path d="M235 230 C170 240 110 270 70 330 C120 310 175 285 228 255 Z" />
+        <path d="M240 260 C180 320 130 390 110 460 C145 400 195 340 242 285 Z" />
+        <!-- Sağ Alt Bacaklar -->
+        <path d="M265 230 C330 240 390 270 430 330 C380 310 325 285 272 255 Z" />
+        <path d="M260 260 C320 320 370 390 390 460 C355 400 305 340 258 285 Z" />
+    </svg>
+
+    <!-- Ana Hesap Makinesi Konteyneri -->
+    <div class="web-border rounded-3xl w-full max-w-sm">
+        <div class="spidey-card rounded-3xl p-6 relative overflow-hidden">
+
+            <!-- Başlık & İkon -->
+            <div class="flex items-center justify-between mb-4 pb-2 border-b border-red-900/40">
+                <div class="flex items-center space-x-2">
+                    <!-- Spider-Man İkonu (SVG Örümcek) -->
+                    <svg class="w-7 h-7 text-red-500 spider-logo" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C11.5 2 11 2.5 11 3V5C9.5 5.2 8.2 5.8 7.1 6.7L5.4 5 4 6.4L5.8 8.2C5.1 9.3 4.6 10.6 4.3 12H2V14H4.3C4.6 15.4 5.1 16.7 5.8 17.8L4 19.6L5.4 21L7.1 19.3C8.2 20.2 9.5 20.8 11 21V23H13V21C14.5 20.8 15.8 20.2 16.9 19.3L18.6 21L20 19.6L18.2 17.8C18.9 16.7 19.4 15.4 19.7 14H22V12H19.7C19.4 10.6 18.9 9.3 18.2 8.2L20 6.4L18.6 5L16.9 6.7C15.8 5.8 14.5 5.2 13 5V3C13 2.5 12.5 2 12 2ZM12 7C14.8 7 17 9.2 17 12C17 14.8 14.8 17 12 17C9.2 17 7 14.8 7 12C7 9.2 9.2 7 12 7Z"/>
+                    </svg>
+                    <span class="font-orbitron font-extrabold text-lg tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-red-500 via-white to-blue-400">
+                        SPIDER-MAN
+                    </span>
+                </div>
+            </div>
+
+            <!-- Ekran Ekranı (Display) -->
+            <div class="bg-slate-950/90 rounded-2xl p-4 mb-5 border border-blue-900/40 shadow-inner flex flex-col justify-end min-h-[100px] text-right">
+                <!-- Geçmiş / Yapılan İşlem -->
+                <div id="history" class="text-xs font-orbitron text-gray-400 h-5 overflow-hidden tracking-wider mb-1 opacity-80">
+                    <!-- Dinamik yazılacak -->
+                </div>
+                <!-- Ana Sonuç Ekrani -->
+                <div id="display" class="font-orbitron text-3xl sm:text-4xl font-bold text-white tracking-widest break-all overflow-x-auto">
+                    0
+                </div>
+            </div>
+
+            <!-- Tuş Takımı Grid -->
+            <div class="grid grid-cols-4 gap-3">
+                <!-- 1. Satır -->
+                <button onclick="clearAll()" class="btn-spidey btn-clear py-3.5 rounded-xl font-orbitron font-bold text-base">C</button>
+                <button onclick="calculateSqrt()" class="btn-spidey btn-action py-3.5 rounded-xl font-bold text-lg">√</button>
+                <button onclick="calculatePercent()" class="btn-spidey btn-action py-3.5 rounded-xl font-bold text-lg">%</button>
+                <button onclick="appendOperator('/')" class="btn-spidey btn-op py-3.5 rounded-xl font-bold text-xl">÷</button>
+
+                <!-- 2. Satır -->
+                <button onclick="appendNumber('7')" class="btn-spidey btn-num py-3.5 rounded-xl font-orbitron font-bold text-lg">7</button>
+                <button onclick="appendNumber('8')" class="btn-spidey btn-num py-3.5 rounded-xl font-orbitron font-bold text-lg">8</button>
+                <button onclick="appendNumber('9')" class="btn-spidey btn-num py-3.5 rounded-xl font-orbitron font-bold text-lg">9</button>
+                <button onclick="appendOperator('*')" class="btn-spidey btn-op py-3.5 rounded-xl font-bold text-xl">×</button>
+
+                <!-- 3. Satır -->
+                <button onclick="appendNumber('4')" class="btn-spidey btn-num py-3.5 rounded-xl font-orbitron font-bold text-lg">4</button>
+                <button onclick="appendNumber('5')" class="btn-spidey btn-num py-3.5 rounded-xl font-orbitron font-bold text-lg">5</button>
+                <button onclick="appendNumber('6')" class="btn-spidey btn-num py-3.5 rounded-xl font-orbitron font-bold text-lg">6</button>
+                <button onclick="appendOperator('-')" class="btn-spidey btn-op py-3.5 rounded-xl font-bold text-xl">-</button>
+
+                <!-- 4. Satır -->
+                <button onclick="appendNumber('1')" class="btn-spidey btn-num py-3.5 rounded-xl font-orbitron font-bold text-lg">1</button>
+                <button onclick="appendNumber('2')" class="btn-spidey btn-num py-3.5 rounded-xl font-orbitron font-bold text-lg">2</button>
+                <button onclick="appendNumber('3')" class="btn-spidey btn-num py-3.5 rounded-xl font-orbitron font-bold text-lg">3</button>
+                <button onclick="appendOperator('+')" class="btn-spidey btn-op py-3.5 rounded-xl font-bold text-xl">+</button>
+
+                <!-- 5. Satır -->
+                <button onclick="toggleSign()" class="btn-spidey btn-num py-3.5 rounded-xl font-bold text-base">±</button>
+                <button onclick="appendNumber('0')" class="btn-spidey btn-num py-3.5 rounded-xl font-orbitron font-bold text-lg">0</button>
+                <button onclick="appendDot()" class="btn-spidey btn-num py-3.5 rounded-xl font-bold text-xl">.</button>
+                <button onclick="calculate()" class="btn-spidey btn-equal py-3.5 rounded-xl font-bold text-xl">=</button>
+            </div>
+
+            <!-- Alt Motif Yazısı -->
+            <div class="mt-4 text-center">
+                <p class="text-[10px] text-gray-500 tracking-widest font-orbitron uppercase">
+                    With great power comes great calculation
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- JavaScript Mantığı -->
+    <script>
+        // Web Audio API ile Örümcek Ağ Atma Sesi (Web Shooter Sound Effect)
+        let audioCtx = null;
+
+        function playWebShooterSound() {
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const now = audioCtx.currentTime;
+
+                // 1. Beyaz Gürültü (Web Whoosh Effect)
+                const bufferSize = audioCtx.sampleRate * 0.08;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.setValueAtTime(1200, now);
+                filter.frequency.exponentialRampToValueAtTime(3500, now + 0.04);
+                filter.frequency.exponentialRampToValueAtTime(800, now + 0.08);
+                filter.Q.setValueAtTime(3, now);
+
+                const noiseGain = audioCtx.createGain();
+                noiseGain.gain.setValueAtTime(0.4, now);
+                noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+                noise.connect(filter);
+                filter.connect(noiseGain);
+                noiseGain.connect(audioCtx.destination);
+
+                // 2. Tiz Tonlu "Thwip" Klik/Zap Sesi
+                const osc = audioCtx.createOscillator();
+                const oscGain = audioCtx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(2800, now);
+                osc.frequency.exponentialRampToValueAtTime(200, now + 0.05);
+
+                oscGain.gain.setValueAtTime(0.3, now);
+                oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+
+                osc.connect(oscGain);
+                oscGain.connect(audioCtx.destination);
+
+                noise.start(now);
+                osc.start(now);
+                noise.stop(now + 0.08);
+                osc.stop(now + 0.05);
+            } catch (e) {
+                // Ses oynatılamazsa sessiz devam et
+            }
+        }
+
+        const display = document.getElementById('display');
+        const historyDisplay = document.getElementById('history');
+
+        let currentInput = '0';
+        let previousInput = '';
+        let operator = null;
+        let shouldResetDisplay = false;
+
+        // Ekranı Güncelle
+        function updateDisplay() {
+            display.innerText = currentInput;
+            if (operator !== null && previousInput !== '') {
+                const opSymbol = operator === '*' ? '×' : operator === '/' ? '÷' : operator;
+                historyDisplay.innerText = `${previousInput} ${opSymbol}`;
+            } else {
+                historyDisplay.innerText = '';
+            }
+        }
+
+        // Rakam Ekleme
+        function appendNumber(number) {
+            playWebShooterSound();
+            if (currentInput === '0' || shouldResetDisplay) {
+                currentInput = number;
+                shouldResetDisplay = false;
+            } else {
+                if (currentInput.length < 12) { // Uzunluk sınırı
+                    currentInput += number;
+                }
+            }
+            updateDisplay();
+        }
+
+        // Nokta (Ondalık) Ekleme
+        function appendDot() {
+            playWebShooterSound();
+            if (shouldResetDisplay) {
+                currentInput = '0.';
+                shouldResetDisplay = false;
+            } else if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            updateDisplay();
+        }
+
+        // İşaret Değiştirme (±)
+        function toggleSign() {
+            playWebShooterSound();
+            if (currentInput !== '0') {
+                if (currentInput.startsWith('-')) {
+                    currentInput = currentInput.slice(1);
+                } else {
+                    currentInput = '-' + currentInput;
+                }
+                updateDisplay();
+            }
+        }
+
+        // Operatör Seçimi (+, -, *, /)
+        function appendOperator(op) {
+            playWebShooterSound();
+            if (operator !== null && !shouldResetDisplay) {
+                calculate(false);
+            }
+            previousInput = currentInput;
+            operator = op;
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        // Hesaplama Fonksiyonu (=)
+        function calculate(playSound = true) {
+            if (playSound) playWebShooterSound();
+            if (operator === null || shouldResetDisplay) return;
+
+            let result;
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+
+            if (isNaN(prev) || isNaN(current)) return;
+
+            switch (operator) {
+                case '+':
+                    result = prev + current;
+                    break;
+                case '-':
+                    result = prev - current;
+                    break;
+                case '*':
+                    result = prev * current;
+                    break;
+                case '/':
+                    if (current === 0) {
+                        showError('Sıfıra Bölünemez');
+                        return;
+                    }
+                    result = prev / current;
+                    break;
+                default:
+                    return;
+            }
+
+            // Hassas ondalık yuvarlaması
+            result = Math.round(result * 100000000) / 100000000;
+
+            const opSymbol = operator === '*' ? '×' : operator === '/' ? '÷' : operator;
+            historyDisplay.innerText = `${previousInput} ${opSymbol} ${currentInput} =`;
+
+            currentInput = result.toString();
+            operator = null;
+            previousInput = '';
+            shouldResetDisplay = true;
+            display.innerText = currentInput;
+        }
+
+        // Karekök Hesaplama (√)
+        function calculateSqrt() {
+            playWebShooterSound();
+            let val = parseFloat(currentInput);
+            if (isNaN(val)) return;
+
+            if (val < 0) {
+                showError('Geçersiz Girdi');
+                return;
+            }
+
+            let result = Math.sqrt(val);
+            result = Math.round(result * 100000000) / 100000000;
+
+            historyDisplay.innerText = `√(${currentInput})`;
+            currentInput = result.toString();
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        // Yüzde Hesaplama (%)
+        function calculatePercent() {
+            playWebShooterSound();
+            let val = parseFloat(currentInput);
+            if (isNaN(val)) return;
+
+            let result = val / 100;
+            historyDisplay.innerText = `${currentInput}%`;
+            currentInput = result.toString();
+            shouldResetDisplay = true;
+            updateDisplay();
+        }
+
+        // Tümünü Temizle (C)
+        function clearAll() {
+            playWebShooterSound();
+            currentInput = '0';
+            previousInput = '';
+            operator = null;
+            shouldResetDisplay = false;
+            updateDisplay();
+        }
+
+        // Hata Mesajı Gösterme
+        function showError(msg) {
+            display.innerText = msg;
+            historyDisplay.innerText = '';
+            currentInput = '0';
+            previousInput = '';
+            operator = null;
+            shouldResetDisplay = true;
+        }
+
+        // Klavye Desteği
+        document.addEventListener('keydown', (e) => {
+            if (e.key >= '0' && e.key <= '9') appendNumber(e.key);
+            if (e.key === '.') appendDot();
+            if (e.key === '+') appendOperator('+');
+            if (e.key === '-') appendOperator('-');
+            if (e.key === '*') appendOperator('*');
+            if (e.key === '/') {
+                e.preventDefault();
+                appendOperator('/');
+            }
+            if (e.key === 'Enter' || e.key === '=') {
+                e.preventDefault();
+                calculate();
+            }
+            if (e.key === 'Backspace') {
+                playWebShooterSound();
+                if (!shouldResetDisplay && currentInput.length > 1) {
+                    currentInput = currentInput.slice(0, -1);
+                } else {
+                    currentInput = '0';
+                }
+                updateDisplay();
+            }
+            if (e.key === 'Escape') clearAll();
+            if (e.key === '%') calculatePercent();
+        });
+    </script>
+</body>
+</html>
